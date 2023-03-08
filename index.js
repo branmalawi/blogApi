@@ -1,9 +1,10 @@
 const express = require("express");
-const cors = require('cors')
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const upload = multer();
 const blog = require("./src/routes/blog.js");
+const auth = require("./src/routes/auth.js");
 
 const app = express();
 const router = express.Router();
@@ -13,6 +14,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use("/blog", blog);
+app.use("/v1/auth", auth);
 
 app.use("/", (req, res) => {
   console.log("it will use this response");
