@@ -4,8 +4,11 @@ const { validationResult } = require("express-validator");
 const { faker } = require("@faker-js/faker/locale/id_ID");
 const Blog = require("../models/blog");
 
+// calback to handle when POST
 const createBlog = (req, res) => {
   const errors = validationResult(req);
+
+  // logic to throw err if there invalid value and unlink the image
   if (!errors.isEmpty()) {
     fs.unlinkSync(req.file.path);
     const error = new Error("invalid value");
@@ -14,13 +17,14 @@ const createBlog = (req, res) => {
     throw error;
   }
 
+  // logic to throw err when image undefined
   if (!req.file) {
     const error = new Error("gambar harus disertakan");
     error.status = 400;
     throw error;
   }
 
-  //console.log(faker);
+  // inisialisation data before upload to db
   const data = {
     title: faker.lorem.sentence(5),
     article: faker.lorem.paragraphs(5),
@@ -51,7 +55,8 @@ const createBlog = (req, res) => {
     });
 };
 
-const getAllBlog = (req, res) => {
+// calback to handle when GET all data
+const getAllBlog = (req, res, next) => {
   const getBlog = new Blog();
   Blog.find({})
     .then((result) => {
@@ -60,7 +65,7 @@ const getAllBlog = (req, res) => {
         data: result,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => next(err));
 };
 
 module.exports = { createBlog, getAllBlog };

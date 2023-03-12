@@ -3,7 +3,7 @@ const router = express.Router();
 const { body } = require("express-validator");
 const blogController = require("../controller/blog");
 
-// POST some data to db
+// router handler POST http request
 router.post(
   "/post",
   body("title")
@@ -15,7 +15,7 @@ router.post(
   blogController.createBlog
 );
 
-// GET some data from db
+// router handler GET http request (get all data)
 router.get("/", blogController.getAllBlog);
 
 module.exports = router;

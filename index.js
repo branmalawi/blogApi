@@ -7,13 +7,22 @@ const mongoose = require("mongoose");
 const blog = require("./src/routes/blog.js");
 const auth = require("./src/routes/auth.js");
 
+// express setup
 const app = express();
 const router = express.Router();
 const port = 8080;
 
+// middleware allow permission to access file images
+app.use("/images", express.static("images"));
+
+// middleware to handle auto parse string to json
 app.use(bodyParser.json());
+
+// middleware to handle cors problem
 app.use(cors());
 
+// multer setup
+// multer storage logic
 const fileStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "images");
@@ -24,6 +33,8 @@ const fileStorage = multer.diskStorage({
     cb(null, "IMG_" + uniqueSuffix + extention);
   },
 });
+
+// multer filter file logic
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/jpg" ||
@@ -35,22 +46,31 @@ const fileFilter = (req, file, cb) => {
     console.log("file salah");
   }
 };
+
+// multer inisialisation
 const uploadImage = multer({
   storage: fileStorage,
   fileFilter: fileFilter,
   limits: { fileSize: 2 * 1024 * 1024 }, //2mb
 });
 
+// multer handle when upload file
 app.use(uploadImage.single("image"));
+
+// middleware handler req to blog
 app.use("/v1/blog", blog);
+
+// middleware handler req to auth
 app.use("/v1/auth", auth);
 
+// middleware handler all undefined req location
 app.use("/", (req, res) => {
   console.log("it will use this response");
   res.status("404");
   res.send("<h1>page is not found</h1>");
 });
 
+// middleware handler all error
 app.use((err, req, res, next) => {
   console.log(err);
   const status = err.status || err instanceof multer.MulterError ? 400 : 500;
@@ -59,6 +79,7 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message, data });
 });
 
+// mongoose setup
 mongoose
   .connect(
     "mongodb+srv://branmalawi:XkyHCPlYgFME63MZ@cluster0.hioihgn.mongodb.net/?retryWrites=true&w=majority"
