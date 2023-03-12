@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const { validationResult } = require("express-validator");
 const { faker } = require("@faker-js/faker/locale/id_ID");
 const Blog = require("../models/blog");
@@ -5,6 +7,7 @@ const Blog = require("../models/blog");
 const createBlog = (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    fs.unlinkSync(req.file.path);
     const error = new Error("invalid value");
     error.status = 400;
     error.data = errors.array();
