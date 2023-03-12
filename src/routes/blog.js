@@ -3,11 +3,6 @@ const router = express.Router();
 const { body } = require("express-validator");
 const blogController = require("../controller/blog");
 
-/*router.use((req, res, next) => {
-  console.log("thus time is", 15);
-  next();
-});*/
-
 // POST some data to db
 router.post(
   "/post",

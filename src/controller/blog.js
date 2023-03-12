@@ -5,13 +5,23 @@ const Blog = require("../models/blog");
 const createBlog = (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error("invalid value");
+    error.status = 400;
+    error.data = errors.array();
+    throw error;
   }
+
+  if (!req.file) {
+    const error = new Error("gambar harus disertakan");
+    error.status = 400;
+    throw error;
+  }
+
   //console.log(faker);
   const data = {
     title: faker.lorem.sentence(5),
     article: faker.lorem.paragraphs(5),
-    image: faker.image.imageUrl(1280, 1120, "cat", true),
+    image: req.file.filename,
     author: {
       uid: faker.datatype.uuid(),
       name: faker.name.fullName(),
