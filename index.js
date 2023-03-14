@@ -66,7 +66,7 @@ app.use("/v1/auth", auth);
 // middleware handler all undefined req location
 app.use("/", (req, res) => {
   console.log("it will use this response");
-  res.status("404");
+  res.status(404);
   res.send("<h1>page is not found</h1>");
 });
 

@@ -17,6 +17,8 @@ const createBlog = (req, res) => {
     throw error;
   }
 
+  console.log(req.file);
+
   // logic to throw err when image undefined
   if (!req.file) {
     const error = new Error("gambar harus disertakan");
@@ -41,7 +43,6 @@ const createBlog = (req, res) => {
 
   Post.save()
     .then((result) => {
-      console.log(result);
       res.status(200).json({
         message: "data berhasil di tambahkan",
         data: result,
@@ -68,4 +69,59 @@ const getAllBlog = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-module.exports = { createBlog, getAllBlog };
+// calback to handle when GET detail data
+const getBlog = (req, res, next) => {
+  const getBlog = new Blog();
+  const id = req.params.id;
+  Blog.findById(id)
+    .then((result) => {
+      if (!result) {
+        const error = new Error("id invalid");
+        error.status = 400;
+        throw error;
+      }
+      res.status(200).json({
+        message: "data berhasil diambil",
+        data: result,
+      });
+    })
+    .catch((err) => next(err));
+};
+
+// calback to handle when UPDATE some data
+const updateBlog = (req, res, next) => {
+  const getBlog = new Blog();
+  const id = req.params.id;
+  Blog.findById(id)
+    .then((Data) => {
+      if (!Data) {
+        const error = new Error("id invalid");
+        error.status = 400;
+        throw error;
+      }
+
+      Data.title = faker.lorem.sentence(5);
+      Data.article = faker.lorem.paragraphs(5);
+      if (req.file) {
+        fs.unlinkSync(req.file.destination + "/" + Data.image);
+        Data.image = req.file.filename;
+      }
+
+      Data.save()
+        .then((result) => {
+          res.status(200).json({
+            message: "data berhasil di tambahkan",
+            data: result,
+          });
+        })
+        .catch((err) => {
+          res.status(400).json({
+            message: "data berhasil di tambahkan",
+            ...err,
+          });
+        });
+    })
+    .catch((err) => next(err));
+};
+
+module.exports = { createBlog, getAllBlog, getBlog, updateBlog };
